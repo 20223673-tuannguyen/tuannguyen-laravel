@@ -1,0 +1,108 @@
+import 'package:flutter/material.dart';
+
+void main() {
+  runApp(InterestCalculatorApp());
+}
+
+class InterestCalculatorApp extends StatelessWidget {
+  @override
+  Widget build(BuildContext context) {
+    return MaterialApp(
+      title: 'Tính lãi suất',
+      theme: ThemeData(primarySwatch: Colors.blue),
+      home: InterestCalculatorPage(),
+    );
+  }
+}
+
+class InterestCalculatorPage extends StatefulWidget {
+  @override
+  _InterestCalculatorPageState createState() =>
+      _InterestCalculatorPageState();
+}
+
+class _InterestCalculatorPageState extends State<InterestCalculatorPage> {
+  final _principalController = TextEditingController();
+  final _rateController = TextEditingController();
+  final _monthsController = TextEditingController();
+
+  double? _interest;
+  double? _total;
+
+  void _calculateInterest() {
+    final principal = double.tryParse(_principalController.text);
+    final rate = double.tryParse(_rateController.text);
+    final months = double.tryParse(_monthsController.text);
+
+    if (principal == null || rate == null || months == null) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text('Vui lòng nhập đúng số liệu')),
+      );
+      return;
+    }
+
+    // Công thức lãi đơn: Lãi = Gốc * (lãi suất / 100) * (tháng / 12)
+    final interest = principal * (rate / 100) * (months / 12);
+    final total = principal + interest;
+
+    setState(() {
+      _interest = interest;
+      _total = total;
+    });
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return Scaffold(
+      appBar: AppBar(title: Text('Tính lãi suất')),
+      body: Padding(
+        padding: const EdgeInsets.all(16.0),
+        child: Column(
+          children: [
+            TextField(
+              controller: _principalController,
+              keyboardType: TextInputType.number,
+              decoration: InputDecoration(
+                labelText: 'Số tiền gốc (VND)',
+                border: OutlineInputBorder(),
+              ),
+            ),
+            SizedBox(height: 10),
+            TextField(
+              controller: _rateController,
+              keyboardType: TextInputType.number,
+              decoration: InputDecoration(
+                labelText: 'Lãi suất (%) / năm',
+                border: OutlineInputBorder(),
+              ),
+            ),
+            SizedBox(height: 10),
+            TextField(
+              controller: _monthsController,
+              keyboardType: TextInputType.number,
+              decoration: InputDecoration(
+                labelText: 'Số tháng gửi',
+                border: OutlineInputBorder(),
+              ),
+            ),
+            SizedBox(height: 20),
+            ElevatedButton(
+              onPressed: _calculateInterest,
+              child: Text('Tính lãi suất'),
+            ),
+            SizedBox(height: 20),
+            if (_interest != null && _total != null)
+              Column(
+                children: [
+                  Text('Tiền lãi: ${_interest!.toStringAsFixed(2)} VND',
+                      style: TextStyle(fontSize: 18)),
+                  Text('Tổng tiền: ${_total!.toStringAsFixed(2)} VND',
+                      style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold)),
+                ],
+              ),
+          ],
+        ),
+      ),
+    );
+  }
+}
